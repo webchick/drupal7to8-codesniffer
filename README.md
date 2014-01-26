@@ -19,3 +19,7 @@ Resources
 * "Official" coding standard tutorial: http://pear.php.net/manual/en/package.php.php-codesniffer.coding-standard-tutorial.php
 * Another tutorial: http://techportal.inviqa.com/2009/10/12/usphp_code_sniffer/
 * Another one: http://www.kingkludge.net/2009/02/codesniffer-part-3-writing-an-example-codesniffer-standard/
+
+**Reference**
+* PHP Tokens: http://www.php.net/manual/en/tokens.php
+* PHPCS Tokens: https://github.com/squizlabs/PHP_CodeSniffer/blob/master/CodeSniffer/Tokens.php

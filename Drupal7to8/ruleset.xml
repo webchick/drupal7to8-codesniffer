@@ -1,4 +1,10 @@
 <?xml version="1.0"?>
 <ruleset name="Drupal7to8">
  <description>Sniffs for converting Drupal 7 code to Drupal 8 code.</description>
+  <rule ref="Internal.NoCodeFound">
+    <!-- Usually there is no code in txt or info files, so we suppress warnings about
+    PHP short tags and what not. -->
+    <exclude-pattern>*.txt</exclude-pattern>
+    <exclude-pattern>*.info</exclude-pattern>
+  </rule>
 </ruleset>

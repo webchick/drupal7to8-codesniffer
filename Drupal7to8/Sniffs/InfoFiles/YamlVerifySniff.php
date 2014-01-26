@@ -45,7 +45,7 @@ class Drupal7to8_Sniffs_InfoFiles_YamlVerifySniff implements PHP_CodeSniffer_Sni
     // Verify that contents of file is valid YAML.
     $file = file_get_contents($phpcsFile->getFilename());
     // @todo: This should be much fancier and use e.g. Symfony YAML component.
-    if (strstr($file, ' = ')) {
+    if (strstr($file, ' = ') || strstr($file, '[]')) {
       $phpcsFile->addError('.info.yml file did not parse as valid YAML: https://drupal.org/node/1935708', $stackPtr, 'YamlVerify');
     }
   }

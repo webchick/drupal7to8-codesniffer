@@ -36,3 +36,4 @@ Resources
 **Reference**
 * PHP Tokens: http://www.php.net/manual/en/tokens.php
 * PHPCS Tokens: https://github.com/squizlabs/PHP_CodeSniffer/blob/master/CodeSniffer/Tokens.php
+* Lots of examples of Sniffs you can copy/paste bits from: https://github.com/search?q=implements+PHP_CodeSniffer_Sniff&ref=cmdform&type=Code

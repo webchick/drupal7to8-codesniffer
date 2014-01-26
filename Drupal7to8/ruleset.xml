@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<ruleset name="Drupal7to8">
+ <description>Sniffs for converting Drupal 7 code to Drupal 8 code.</description>
+</ruleset>

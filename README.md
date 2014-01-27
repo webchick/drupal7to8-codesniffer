@@ -1,7 +1,7 @@
 drupal7to8-codesniffer
 ======================
 
-1. Install PHP_CodeSniffer
+1. Install the "phpcs-fixer" branch of PHP_CodeSniffer: https://github.com/squizlabs/PHP_CodeSniffer/tree/phpcs-fixer
 2. Run it with `phpcs --standard=Drupal7to8 .` in your Drupal 7 module directory
 3. ???
 4. Profit!
@@ -17,7 +17,8 @@ Writing an upgrade sniff
 6. That interface requires you define two methods: register() and process(). Register() indicates what kind of "tokens" you want this rule to fire on, such as T_COMMENT (for any kind of comments), T_WHITESPACE (for any kind of whitespace), and so on. See the "References" section below for more info.
 7. Process() is where you do your logic to identify problems with the code. This function is executed on every line of code that matches the conditions in register(). You get the file that's being processed (and any other info needed like the file name, line of code it's reading, etc.) as well as a pointer to which line in the file is there.
 8. Call $phpcsFile->addError() when you want to trigger an error for folks. Make sure to include a reference to the change notice where people can solve their problems!
-9. Keep each Sniff to one problem space/change notice to keep the code easy to read/write. (TODO: Not actually sure if that's true... we may want to bundle changes into fewer classes/process functions instead, but let's see how this goes first :))
+9. If you want to be *extra* fancy, call $phpcsFile->addFixablError(), and then insert some logic to actually make the code changes to the file. See a write-up at https://drupal.org/node/2099351#comment-8417099.
+10. Keep each Sniff to one problem space/change notice to keep the code easy to read/write. (TODO: Not actually sure if that's true... we may want to bundle changes into fewer classes/process functions instead, but let's see how this goes first :))
 
 Resources
 =========

@@ -36,16 +36,13 @@ class Drupal7to8_Sniffs_InfoFiles_CoreTo8xSniff implements PHP_CodeSniffer_Sniff
       return;
     }
 
-    // Only run once per file.
+    // Check for (and fix) invalid "core" attribute.
     $tokens = $phpcsFile->getTokens();
-    if ($tokens[$stackPtr]['line'] !== 1) {
-      return;
-    }
-
-    // Check for invalid "core" attribute.
-    $file = file_get_contents($phpcsFile->getFilename());
-    if (strstr($file, 'core: 7.x')) {
-      $phpcsFile->addError('Upgrade core version to "8.x" in .info.yml file: https://drupal.org/node/1935708', $stackPtr, 'CoreTo8x');
+    if (strstr($tokens[$stackPtr]['content'], '7.x')) {
+      $fix = $phpcsFile->addFixableError('Upgrade core version to "8.x" in .info.yml file: https://drupal.org/node/1935708', $stackPtr, 'CoreTo8x');
+      if ($fix === true && $phpcsFile->fixer->enabled === true) {
+        $phpcsFile->fixer->replaceToken($stackPtr, "core: 8.x\n");
+      }
     }
   }
 }

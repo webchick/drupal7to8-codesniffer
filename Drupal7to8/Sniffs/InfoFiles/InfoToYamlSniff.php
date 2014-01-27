@@ -43,6 +43,17 @@ class Drupal7to8_Sniffs_InfoFiles_InfoToYamlSniff implements PHP_CodeSniffer_Sni
     }
 
     // If we got this far, trigger an error.
-    $phpcsFile->addError('.info files are now .info.yml files: https://drupal.org/node/1935708', $stackPtr, 'InfoToYaml');
+    $fix = $phpcsFile->addFixableError('.info files are now .info.yml files: https://drupal.org/node/1935708', $stackPtr, 'InfoToYaml');
+    if ($fix === true && $phpcsFile->fixer->enabled === true) {
+      // Take contents of the old file and write them out to an .info.yml file.
+      $contents = file_get_contents($phpcsFile->getFilename());
+      $filename = $phpcsFile->getFilename() . '.yml';
+      file_put_contents($filename, $contents);
+
+      // Remove the old file.
+      // @todo This is not only dangerous, it also causes an error when the file
+      // it was checking suddenly vanishes. ;)
+      //unlink($phpcsFile->getFilename());
+    }
   }
 }

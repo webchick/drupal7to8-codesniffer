@@ -9,7 +9,7 @@ drupal7to8-codesniffer
 Writing an upgrade sniff
 ========================
 
-1. Check https://drupal.org/list-changes for something that sounds tasty.
+1. Check https://drupal.org/list-changes for something that sounds tasty. Try and prioritize the most frequently used hooks (https://gist.github.com/webchickenator/4409685) over others.
 2. If there isn't one already, create a new folder under the Drupal7to8/Sniffs directory for the general "topic" area of the change notice you're coding up. For example, "InfoFiles".
 3. Create a new PHP class file in the topic directory called "DescriptiveNameOfChangeSniff.php" (Sniff.php on the end is required) for example, "InfoToYamlSniff.php".
 4. Define the PHP class name using the following convention: Drupal7to8_Sniffs_**Topic**_**FilenameWithoutDotPhp**. For example, "class Drupal7to8_Sniffs_InfoFiles_InfoToYamlSniff"

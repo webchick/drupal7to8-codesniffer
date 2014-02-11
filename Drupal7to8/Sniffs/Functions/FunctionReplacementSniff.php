@@ -35,10 +35,14 @@ class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniff
    * {@inheritdoc}
    */
   protected function addError($phpcsFile, $stackPtr, $function, $pattern = NULL) {
+    $fix = FALSE;
     $message = strtr($this->message, array('!function' => $function));
-    $fix = $phpcsFile->addFixableError($message, $stackPtr, $this->code);
 
-    if ($fix === true && $phpcsFile->fixer->enabled === true) {
+    if ($this->hasFix($function, $pattern)) {
+      $fix = $phpcsFile->addFixableError($message, $stackPtr, $this->code);
+    }
+
+    if ($fix === TRUE && $phpcsFile->fixer->enabled === TRUE) {
       $tokens = $phpcsFile->getTokens();
 
       if (isset($this->dynamicArgumentReplacements[$function])) {
@@ -72,8 +76,23 @@ class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniff
       }
     }
     elseif ($fix === FALSE) {
-      parent::addError($phpcsFile, $stackPtr, $function, $pattern);
+      $phpcsFile->addError($message, $stackPtr, $this->code);
     }
+  }
+
+  /**
+   * Checks whether this sniff has a replacement for the given function/pattern.
+   *
+   * @param string $function
+   * @param string|null $pattern
+   * @return boolean
+   */
+  protected function hasFix($function, $pattern = NULL) {
+    if ($pattern === NULL) {
+      $pattern = $function;
+    }
+
+    return $this->forbiddenFunctions[$pattern] !== NULL;
   }
 
   /**

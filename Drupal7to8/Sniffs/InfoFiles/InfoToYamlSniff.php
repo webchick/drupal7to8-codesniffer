@@ -10,7 +10,7 @@
  */
 
 /**
- * Warns that .info files are now .info.yml files.
+ * Warns that .info files are now .info.yml files, and attempts to rename them.
  *
  * @category PHP
  * @package  PHP_CodeSniffer
@@ -42,7 +42,7 @@ class Drupal7to8_Sniffs_InfoFiles_InfoToYamlSniff implements PHP_CodeSniffer_Sni
       return;
     }
 
-    // If .info.yml file already exists, we're good to go.
+    // If .info.yml file already exists, our work here is done.
     if (file_exists($phpcsFile->getFilename() . '.yml')) {
       return;
     }
@@ -55,10 +55,9 @@ class Drupal7to8_Sniffs_InfoFiles_InfoToYamlSniff implements PHP_CodeSniffer_Sni
       $filename = $phpcsFile->getFilename() . '.yml';
       file_put_contents($filename, $contents);
 
-      // Remove the old file.
-      // @todo This is not only dangerous, it also causes an error when the file
-      // it was checking suddenly vanishes. ;)
-      //unlink($phpcsFile->getFilename());
+      // @todo Leave a @todo in the original .info file to remove it.
+      //$contents = "; @todo: Remove this file once your module is ported.\n" . $contents;
+      //file_put_contents($phpcsFile->getFilename(), $contents);
     }
   }
 }

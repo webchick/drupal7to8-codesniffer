@@ -55,15 +55,11 @@ class Drupal7to8_Sniffs_InfoFiles_YamlVerifySniff implements PHP_CodeSniffer_Sni
     }
     catch (ParseException $e) {
       $fix = $phpcsFile->addFixableError('.info.yml file did not parse as valid YAML: https://drupal.org/node/1935708', $stackPtr, 'YamlVerify');
-      if ($fix === true && $phpcsFile->fixer->enabled === true) {
+# @todo For some reason, $phpcsFile->fixer->enabled is not true here when running phpcbf. wtf.
+#      if ($fix === true && $phpcsFile->fixer->enabled === true) {
         $file = file_get_contents($phpcsFile->getFilename());
-        $info = $info = $this->drupalParseInfoFormat($file);
-        if (!empty($info)) {
-          // Write out info as YAML instead.
-          $info = Yaml::dump($info);
-          file_put_contents($phpcsFile->getFilename(), $info);
-        }
-      }
+        $info = $this->drupalParseInfoFormat($file);
+#      }
     }
 
     // Now we should have valid YAML. Check for required/extraneous properties.
@@ -71,34 +67,45 @@ class Drupal7to8_Sniffs_InfoFiles_YamlVerifySniff implements PHP_CodeSniffer_Sni
     // type: module
     if (!array_key_exists('type', $info)) {
       $fix = $phpcsFile->addFixableError('Missing required "type" property: https://drupal.org/node/1935708', $stackPtr, 'YamlVerify');
-      if ($fix === true && $phpcsFile->fixer->enabled === true) {
+# @todo For some reason, $phpcsFile->fixer->enabled is not true here when running phpcbf. wtf.
+#      if ($fix === true && $phpcsFile->fixer->enabled === true) {
         // Add it.
         // @todo: If we start fixing themes and profiles, we can't just do this.
         $info['type'] = 'module';
-      }
+#      }
     }
 
     // core: 8.x
     if ($info['core'] == '7.x') {
       $fix = $phpcsFile->addFixableError('The "core" property must change to "8.x": https://drupal.org/node/1935708', $stackPtr, 'YamlVerify');
-      if ($fix === true && $phpcsFile->fixer->enabled === true) {
+# @todo For some reason, $phpcsFile->fixer->enabled is not true here when running phpcbf. wtf.
+#      if ($fix === true && $phpcsFile->fixer->enabled === true) {
         // Fix it.
         $info['core'] = '8.x';
-      }
+#      }
     }
 
     // files array
     if (array_key_exists('files', $info)) {
-      // Don't think we should can/should fix this one. Raise an error instead.
+      // We can't really fix this, so leave the warning here.
       $phpcsFile->addError('Drupal 8 now uses PSR class loading; remove "files" entries from .info.yml file.: https://drupal.org/node/1320394', $stackPtr, 'YamlVerify');
     }
+
+    // styles and scripts array
+    if (array_key_exists('stylesheets', $info) || array_key_exists('scripts', $info)) {
+      // Don't think we can fix this one.
+      $phpcsFile->addError('Modules can no longer add stylesheets/scripts via their .info.yml file: https://drupal.org/node/1876152', $stackPtr, 'YamlVerify');
+    }
+
 
     // @todo: Dependencies that are no longer needed in 8.x.
 
     // All done with our checks; write the YAML out again.
-    if ($phpcsFile->fixer->enabled === true) {
-      file_put_contents($phpcsFile->getFilename(), $info);
-    }
+# @todo For some reason, $phpcsFile->fixer->enabled is not true here when running phpcbf. wtf.
+#    if ($phpcsFile->fixer->enabled === true) {
+      $yaml = Yaml::dump($info);
+      file_put_contents($phpcsFile->getFilename(), $yaml);
+#    }
   }
 
   /**

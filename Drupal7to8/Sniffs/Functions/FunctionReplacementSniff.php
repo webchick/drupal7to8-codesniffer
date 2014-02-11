@@ -1,0 +1,164 @@
+<?php
+/**
+ * Drupal7to8_Sniffs_Functions_FunctionReplacementSniff.
+ *
+ * PHP version 5
+ *
+ * @category PHP
+ * @package  PHP_CodeSniffer
+ * @link     http://pear.php.net/package/PHP_CodeSniffer
+ */
+
+/**
+ * Drupal7to8_Sniffs_Functions_FunctionReplacementSniff.
+ *
+ * Extends the capabilities of Generic_Sniffs_PHP_ForbiddenFunctionsSniff with
+ * two things:
+ * 1) fixability
+ * 2) optionally: dynamic argument replacement
+ *
+ * @category PHP
+ * @package  PHP_CodeSniffer
+ * @link     http://pear.php.net/package/PHP_CodeSniffer
+ */
+class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniffs_PHP_ForbiddenFunctionsSniff {
+
+  protected $forbiddenFunctions = array();
+
+  protected $dynamicArgumentReplacements = array();
+
+  protected $message = '';
+
+  protected $code = '';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function addError($phpcsFile, $stackPtr, $function, $pattern = NULL) {
+    $fix = $phpcsFile->addFixableError($this->message, $stackPtr, $this->code);
+
+    if ($fix === true && $phpcsFile->fixer->enabled === true) {
+      $tokens = $phpcsFile->getTokens();
+
+      if (isset($this->dynamicArgumentReplacements[$function])) {
+        $replacement_info = $this->dynamicArgumentReplacements[$function];
+        $arguments = $replacement_info['arguments'];
+
+        // Find the arguments that need to be moved around, remove them, and
+        // dynamically build the replacement string for this function call.
+        $replacement = $replacement_info['string'];
+        foreach ($arguments as $argument) {
+          // Find the token range representing the nth argument.
+          $result = $this->findNthArgument($phpcsFile, $stackPtr, $argument);
+          // Return early if there is no nth argument.
+          if ($result === FALSE) {
+            continue;
+          }
+          list($arg_start, $arg_end, $remove_start, $remove_end) = $result;
+
+          // Get the string representation of the token range.
+          $content = $this->getContentForTokenRange($tokens, $arg_start, $arg_end);
+          $replacement = strtr($replacement, array('$' . $argument => $content));
+          // Remove the nth argument from the original function call.
+          $this->removeTokenRange($phpcsFile->fixer, $remove_start, $remove_end);
+        }
+
+        // Update the function call.
+        $phpcsFile->fixer->replaceToken($stackPtr, $replacement);
+      }
+      else {
+        $phpcsFile->fixer->replaceToken($stackPtr, $this->forbiddenFunctions[$function]);
+      }
+    }
+    else {
+      parent::addError($phpcsFile, $stackPtr, $function, $pattern);
+    }
+  }
+
+  /**
+   * Given a stack pointer that points to a function invocation or definition,
+   * retrieve the nth argument.
+   *
+   * @param PHP_CodeSniffer_File $phpcsFile
+   * @param int $stackPtr
+   * @param int $n
+   *   The nth function argument. Zero-indexed.
+   *
+   * @return
+   *   FALSE if there is no nth argument, otherwise an array with 4 values:
+   *   - the token where the nth argument starts
+   *   - the token where the nth argument ends
+   *   - the token where removal of the nth argument should begin
+   *   - the token where removal of the nth argument should end
+   */
+  protected function findNthArgument($phpcsFile, $stackPtr, $n) {
+    $tokens = $phpcsFile->getTokens();
+
+    // Find If the next non-whitespace token after the function or method call
+    // is not an opening parenthesis then it cant really be a *call*.
+    $openParenthesis = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, ($stackPtr + 1), NULL, TRUE);
+    $closeParenthesis = $tokens[$openParenthesis]['parenthesis_closer'];
+
+    $arg_start = $openParenthesis + 1;
+    $arg_end = $closeParenthesis - 1;
+    $remove_start = $openParenthesis + 1;
+    $remove_end = $closeParenthesis - 1;
+
+    // Keep increasing the starting point until we've reached the nth argument.
+    if ($n > 0) {
+      $comma = $arg_start;
+
+      for ($arg = 1; $arg <= $n; $arg++) {
+        $comma = $phpcsFile->findNext(T_COMMA, $comma + 1, $closeParenthesis);
+        if ($comma === FALSE) {
+          return FALSE;
+        }
+        elseif ($arg === $n) {
+          $arg_start = $comma + 1;
+          $remove_start = $comma;
+        }
+      }
+    }
+    // But ignore leading whitespace.
+    $arg_start = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, $arg_start, NULL, TRUE);
+
+    // If there still is a next comma, and hence a next argument, then we should
+    // stop before that comma instead of before the closing parenthesis.
+    $nextComma = $phpcsFile->findNext(T_COMMA, ($arg_start + 1), $closeParenthesis);
+    if ($nextComma !== FALSE) {
+      $arg_end = $remove_end = $nextComma - 1;
+    }
+
+    return array($arg_start, $arg_end, $remove_start, $remove_end);
+  }
+
+  /**
+   * Retrieves the content (string representation) for a range of tokens.
+   *
+   * @param array $tokens
+   *   Array of tokens as returned by PHP_CodeSniffer_File::getTokens()
+   * @param int $start
+   * @param int $end
+   */
+  protected function getContentForTokenRange(array $tokens, $start, $end) {
+    $content = '';
+    for ($i = $start; $i <= $end; $i++) {
+      $content .= $tokens[$i]['content'];
+    }
+    return $content;
+  }
+
+  /**
+   * Removes a range of tokens.
+   *
+   * @param PHP_CodeSniffer_Fixer $fixer
+   * @param int $start
+   * @param int $end
+   */
+  protected function removeTokenRange(PHP_CodeSniffer_Fixer $fixer, $start, $end) {
+    for ($i = $start; $i <= $end; $i++) {
+      $fixer->replaceToken($i, '');
+    }
+  }
+
+}

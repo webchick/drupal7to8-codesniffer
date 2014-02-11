@@ -35,7 +35,8 @@ class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniff
    * {@inheritdoc}
    */
   protected function addError($phpcsFile, $stackPtr, $function, $pattern = NULL) {
-    $fix = $phpcsFile->addFixableError($this->message, $stackPtr, $this->code);
+    $message = strtr($this->message, array('!function' => $function));
+    $fix = $phpcsFile->addFixableError($message, $stackPtr, $this->code);
 
     if ($fix === true && $phpcsFile->fixer->enabled === true) {
       $tokens = $phpcsFile->getTokens();
@@ -70,7 +71,7 @@ class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniff
         $phpcsFile->fixer->replaceToken($stackPtr, $this->forbiddenFunctions[$function]);
       }
     }
-    else {
+    elseif ($fix === FALSE) {
       parent::addError($phpcsFile, $stackPtr, $function, $pattern);
     }
   }

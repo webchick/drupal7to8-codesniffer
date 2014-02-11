@@ -41,6 +41,22 @@ class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniff
     if ($this->hasFix($function, $pattern)) {
       $fix = $phpcsFile->addFixableError($message, $stackPtr, $this->code);
     }
+    elseif ($phpcsFile->fixer->enabled === TRUE) {
+      // Prefix the function name with fixme_ so the recursive parsing will
+      // not find it again.
+      $phpcsFile->fixer->replaceToken($stackPtr, 'fixme_' . $function);
+      $tokens = $phpcsFile->getTokens();
+      $this_line = $tokens[$stackPtr]['line'];
+      $prev_token_ptr = $stackPtr;
+      while ($tokens[$prev_token_ptr]['line'] == $this_line) {
+        $prev_token_ptr--;
+      }
+      $whitespace = '';
+      if ($tokens[$prev_token_ptr]['type'] == 'T_WHITESPACE') {
+        $whitespace = $tokens[$prev_token_ptr]['content'];
+      }
+      $phpcsFile->fixer->replaceToken($prev_token_ptr, "\n" . $whitespace . '/** @fixme '. $message . " */\n");
+    }
 
     if ($fix === TRUE && $phpcsFile->fixer->enabled === TRUE) {
       $tokens = $phpcsFile->getTokens();
@@ -70,9 +86,6 @@ class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniff
 
         // Update the function call.
         $phpcsFile->fixer->replaceToken($stackPtr, $replacement);
-      }
-      else {
-        $phpcsFile->fixer->replaceToken($stackPtr, $this->forbiddenFunctions[$function]);
       }
     }
     elseif ($fix === FALSE) {

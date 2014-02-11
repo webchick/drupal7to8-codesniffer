@@ -42,6 +42,11 @@ class Drupal7to8_Sniffs_InfoFiles_InfoToYamlSniff implements PHP_CodeSniffer_Sni
       return;
     }
 
+    // If .info.yml file already exists, we're good to go.
+    if (file_exists($phpcsFile->getFilename() . '.yml')) {
+      return;
+    }
+
     // If we got this far, trigger an error.
     $fix = $phpcsFile->addFixableError('.info files are now .info.yml files: https://drupal.org/node/1935708', $stackPtr, 'InfoToYaml');
     if ($fix === true && $phpcsFile->fixer->enabled === true) {

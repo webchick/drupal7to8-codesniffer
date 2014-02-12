@@ -124,16 +124,12 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
    */
   protected function insertFixMeComment(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $message) {
     $phpcsFile->fixer->addContentBefore($stackPtr, 'fixme_');
+
+    // Prefix the "@fixme" comment with as much whitespace as exists before the
+    // function declaration.
     $tokens = $phpcsFile->getTokens();
-    $this_line = $tokens[$stackPtr]['line'];
-    $prev_token_ptr = $stackPtr;
-    while ($tokens[$prev_token_ptr]['line'] == $this_line) {
-      $prev_token_ptr--;
-    }
-    $whitespace = '';
-    if ($tokens[$prev_token_ptr]['type'] == 'T_WHITESPACE') {
-      $whitespace = $tokens[$prev_token_ptr]['content'];
-    }
+    $whitespace = $tokens[$stackPtr - 1]['content'];
+
     $phpcsFile->fixer->replaceToken($prev_token_ptr, "\n" . $whitespace . '/** @fixme '. $message . " */\n");
   }
 

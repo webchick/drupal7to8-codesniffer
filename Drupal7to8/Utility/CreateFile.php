@@ -47,9 +47,9 @@ class Drupal7to8_Utility_CreateFile {
    *   The converted string.
    */
   public static function camelUnderscores($name, $lowerCamel = FALSE) {
+    $name = str_replace("'", '', $name);
     $pieces = explode('_', $name);
-    array_walk($pieces, 'strtolower');
-    array_walk($pieces, 'ucfirst');
+    $pieces = array_map('ucfirst', array_map('strtolower', $pieces));
     if ($lowerCamel) {
       $pieces[0] = strtolower($pieces[0]);
     }

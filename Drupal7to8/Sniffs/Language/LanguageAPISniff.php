@@ -29,4 +29,25 @@ class Drupal7to8_Sniffs_Language_LanguageAPISniff extends Drupal7to8_Base_Functi
         'language_default' => '\Drupal::languageManager()->getDefaultLanguage',
     );
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function addError($phpcsFile, $stackPtr, $function, $pattern = NULL) {
+        if ($function == 'language_list') {
+            // Find the token range representing the nth argument.
+            $result = $this->findNthArgument($phpcsFile, $stackPtr, 0);
+            // Fall back on parent behavior if there is no nth argument.
+            if ($result === FALSE) {
+                parent::addError($phpcsFile, $stackPtr, $function, $pattern);
+                return;
+            }
+            var_dump($result);
+            $customMessage = 'The argument for the replacement of language_list(), languageManager()->getLanguages() does not take field names anymore. It takes language state. Review Language::STATE_* constants.';
+            $fix = $phpcsFile->addFixableError($customMessage, $stackPtr, $this->code);
+            if ($fix === TRUE && $phpcsFile->fixer->enabled === TRUE) {
+                $this->insertFixMeComment($phpcsFile, $stackPtr, $customMessage, $this->forbiddenFunctions[$function]);
+            }
+        }
+    }
+
 }

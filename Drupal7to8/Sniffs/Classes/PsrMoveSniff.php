@@ -16,7 +16,7 @@
  * @package  PHP_CodeSniffer
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
-class Drupal7to8_Sniffs_Classes_PsrMoveSniff extends PHP_CodeSniffer_Sniff {
+class Drupal7to8_Sniffs_Classes_PsrMoveSniff implements PHP_CodeSniffer_Sniff {
 
   /**
    * {@inheritdoc}

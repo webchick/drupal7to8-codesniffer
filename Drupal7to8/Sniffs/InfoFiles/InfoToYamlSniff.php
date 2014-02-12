@@ -9,6 +9,10 @@
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
 
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Dumper;
+
 /**
  * Warns that .info files are now .info.yml files, and attempts to rename them.
  *

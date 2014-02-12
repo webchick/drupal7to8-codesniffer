@@ -68,10 +68,10 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
           list($arg_start, $arg_end, $remove_start, $remove_end) = $result;
 
           // Get the string representation of the token range.
-          $content = $this->getContentForTokenRange($tokens, $arg_start, $arg_end);
+          $content = Drupal7to8_Utility_TokenRange::getContent($tokens, $arg_start, $arg_end);
           $replacement = strtr($replacement, array('$' . $argument => $content));
           // Remove the nth argument from the original function call.
-          $this->removeTokenRange($phpcsFile->fixer, $remove_start, $remove_end);
+          Drupal7to8_Utility_TokenRange::remove($phpcsFile->fixer, $remove_start, $remove_end);
         }
 
         // Update the function call.
@@ -188,35 +188,6 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
     }
 
     return array($arg_start, $arg_end, $remove_start, $remove_end);
-  }
-
-  /**
-   * Retrieves the content (string representation) for a range of tokens.
-   *
-   * @param array $tokens
-   *   Array of tokens as returned by PHP_CodeSniffer_File::getTokens()
-   * @param int $start
-   * @param int $end
-   */
-  protected function getContentForTokenRange(array $tokens, $start, $end) {
-    $content = '';
-    for ($i = $start; $i <= $end; $i++) {
-      $content .= $tokens[$i]['content'];
-    }
-    return $content;
-  }
-
-  /**
-   * Removes a range of tokens.
-   *
-   * @param PHP_CodeSniffer_Fixer $fixer
-   * @param int $start
-   * @param int $end
-   */
-  protected function removeTokenRange(PHP_CodeSniffer_Fixer $fixer, $start, $end) {
-    for ($i = $start; $i <= $end; $i++) {
-      $fixer->replaceToken($i, '');
-    }
   }
 
 }

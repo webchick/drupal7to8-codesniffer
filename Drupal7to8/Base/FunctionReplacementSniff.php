@@ -84,7 +84,8 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
       $this->insertUseStatement($phpcsFile, $function, $pattern);
     }
     elseif ($fix === FALSE) {
-      $phpcsFile->addError($message, $stackPtr, $this->code);
+      // Add this as a fixable error anyway because the fixme comment changes will not be written either.
+      $phpcsFile->addFixableError($message, $stackPtr, $this->code);
     }
   }
 

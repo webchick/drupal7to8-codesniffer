@@ -122,8 +122,13 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
    *
    * Also prefixes the function name with fixme_ to prevent an endless loop.
    */
-  protected function insertFixMeComment(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $message) {
-    $phpcsFile->fixer->addContentBefore($stackPtr, 'fixme_');
+  protected function insertFixMeComment(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $message, $newName = NULL) {
+    if (!isset($newName)) {
+      $phpcsFile->fixer->addContentBefore($stackPtr, 'fixme_');
+    }
+    else {
+      $phpcsFile->fixer->replaceToken($stackPtr, $newName);
+    }
 
     // Prefix the "@fixme" comment with as much whitespace as exists before the
     // function declaration.
@@ -156,6 +161,10 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
     // is not an opening parenthesis then it cant really be a *call*.
     $openParenthesis = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, ($stackPtr + 1), NULL, TRUE);
     $closeParenthesis = $tokens[$openParenthesis]['parenthesis_closer'];
+    if ($openParenthesis + 1 == $closeParenthesis) {
+      // There are no arguments whatsoever.
+      return FALSE;
+    }
 
     $arg_start = $openParenthesis + 1;
     $arg_end = $closeParenthesis - 1;

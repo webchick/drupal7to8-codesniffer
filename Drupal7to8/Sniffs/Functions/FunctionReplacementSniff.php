@@ -124,7 +124,7 @@ class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniff
       $pattern = $function;
     }
 
-    if ($this->useStatements[$pattern] !== NULL) {
+    if (isset($this->useStatements[$pattern])) {
       $class = $this->useStatements[$pattern];
       $phpcsFile->fixer->addContent(0, "\nuse $class;");
     }

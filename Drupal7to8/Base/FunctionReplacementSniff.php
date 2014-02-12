@@ -37,7 +37,7 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
   /**
    * {@inheritdoc}
    */
-  protected function addError(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $function, $pattern = NULL) {
+  protected function addError($phpcsFile, $stackPtr, $function, $pattern = NULL) {
     $fix = FALSE;
     $message = strtr($this->message, array('!function' => $function));
 

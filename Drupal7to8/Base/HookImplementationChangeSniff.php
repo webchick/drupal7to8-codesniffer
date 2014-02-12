@@ -43,28 +43,26 @@ class Drupal7to8_Base_HookImplementationChangeSniff implements PHP_CodeSniffer_S
   public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
     $tokens = $phpcsFile->getTokens();
 
-    if ($tokens[$stackPtr]['type'] === 'T_FUNCTION') {
-      $function_name = $tokens[$stackPtr + 2]['content'];
-      $module_name = Drupal7to8_Utility_ModuleProperties::getModuleName($phpcsFile);
+    $function_name = $tokens[$stackPtr + 2]['content'];
+    $module_name = Drupal7to8_Utility_ModuleProperties::getModuleName($phpcsFile);
 
-      // Determine the expected function name.
-      $expected = $module_name . '_' . $this->hook;
-      if ($this->has_alter_hook && preg_match('/_alter$/', $function_name)) {
-        $expected .= '_alter';
+    // Determine the expected function name.
+    $expected = $module_name . '_' . $this->hook;
+    if ($this->has_alter_hook && preg_match('/_alter$/', $function_name)) {
+      $expected .= '_alter';
+    }
+
+    $matches = array();
+    if ($function_name === $expected) {
+      $message = strtr($this->message, array('!function' => $function_name));
+      if ($this->is_fixable) {
+        $fix = $phpcsFile->addFixableError($message, $stackPtr, $this->code);
+        if ($fix === TRUE && $phpcsFile->fixer->enabled === TRUE) {
+          $this->fix($phpcsFile, $stackPtr, $module_name, $expected);
+        }
       }
-
-      $matches = array();
-      if ($function_name === $expected) {
-        $message = strtr($this->message, array('!function' => $function_name));
-        if ($this->is_fixable) {
-          $fix = $phpcsFile->addFixableError($message, $stackPtr, $this->code);
-          if ($fix === TRUE && $phpcsFile->fixer->enabled === TRUE) {
-            $this->fix($phpcsFile, $stackPtr, $module_name, $expected);
-          }
-        }
-        else {
-          $phpcsFile->addError($message, $stackPtr, $this->code);
-        }
+      else {
+        $phpcsFile->addError($message, $stackPtr, $this->code);
       }
     }
   }

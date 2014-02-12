@@ -16,7 +16,7 @@
  * @package  PHP_CodeSniffer
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
-class Drupal7to8_Sniffs_VariableAPI_VariableAPISniff extends Drupal7to8_Sniffs_Functions_FunctionReplacementSniff {
+class Drupal7to8_Sniffs_VariableAPI_VariableAPISniff extends Drupal7to8_Base_FunctionReplacementSniff {
 
   protected $message = '!function() has been replaced by the Configuration API: https://drupal.org/node/2183531';
 

@@ -16,7 +16,7 @@
  * @package  PHP_CodeSniffer
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
-class Drupal7to8_Sniffs_Cache_NewCacheApiSniff extends Drupal7to8_Sniffs_Functions_FunctionReplacementSniff {
+class Drupal7to8_Sniffs_Cache_NewCacheApiSniff extends Drupal7to8_Base_FunctionReplacementSniff {
 
   protected $message = '!function() has been removed in the new Cache API: https://drupal.org/node/1766152';
 

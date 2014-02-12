@@ -16,7 +16,7 @@
  * @package  PHP_CodeSniffer
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
-class Drupal7to8_Sniffs_Assets_DrupalAddSniff extends Drupal7to8_Sniffs_Functions_FunctionReplacementSniff {
+class Drupal7to8_Sniffs_Assets_DrupalAddSniff extends Drupal7to8_Base_FunctionReplacementSniff {
 
     protected $message = '!function() was removed. Use #attached in your render array: https://drupal.org/node/2169605';
 

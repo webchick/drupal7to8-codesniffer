@@ -1,6 +1,6 @@
 <?php
 /**
- * Drupal7to8_Sniffs_Functions_FunctionReplacementSniff.
+ * Drupal7to8_Base_FunctionReplacementSniff.
  *
  * PHP version 5
  *
@@ -10,7 +10,7 @@
  */
 
 /**
- * Drupal7to8_Sniffs_Functions_FunctionReplacementSniff.
+ * Drupal7to8_Base_FunctionReplacementSniff.
  *
  * Extends the capabilities of Generic_Sniffs_PHP_ForbiddenFunctionsSniff with
  * two things:
@@ -22,7 +22,7 @@
  * @package  PHP_CodeSniffer
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
-class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniffs_PHP_ForbiddenFunctionsSniff {
+class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_ForbiddenFunctionsSniff {
 
   protected $forbiddenFunctions = array();
 

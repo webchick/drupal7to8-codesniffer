@@ -16,7 +16,7 @@
  * @package  PHP_CodeSniffer
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
-class Drupal7to8_Sniffs_File_FileCreateHtaccessSniff extends Drupal7to8_Sniffs_Functions_FunctionReplacementSniff {
+class Drupal7to8_Sniffs_File_FileCreateHtaccessSniff extends Drupal7to8_Base_FunctionReplacementSniff {
 
   protected $message = 'file_create_htaccess() renamed to to file_save_htaccess(): https://drupal.org/node/1336568';
 

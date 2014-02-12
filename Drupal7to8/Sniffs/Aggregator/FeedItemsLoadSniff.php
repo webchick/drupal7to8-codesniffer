@@ -16,7 +16,7 @@
  * @package  PHP_CodeSniffer
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
-class Drupal7to8_Sniffs_Aggregator_FeedItemsLoadSniff extends Drupal7to8_Sniffs_Functions_FunctionReplacementSniff {
+class Drupal7to8_Sniffs_Aggregator_FeedItemsLoadSniff extends Drupal7to8_Base_FunctionReplacementSniff {
 
   protected $message = 'aggregator_feed_items_load() renamed to aggregator_load_feed_items(): https://drupal.org/node/1295398';
 

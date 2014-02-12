@@ -27,37 +27,4 @@ class Drupal7to8_Sniffs_VariableAPI_VariableAPISniff extends Drupal7to8_Sniffs_F
     'variable_set' => NULL,
     'variable_del' => NULL,
   );
-
-  public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
-    parent::process($phpcsFile, $stackPtr);
-    $module_name = $this->getModuleName($phpcsFile);
-  }
-
-  /**
-   * Determine the module name based on the file being examined.
-   *
-   * @param PHP_CodeSniffer_File $phpcsFile
-   *   The code sniffer file.
-   * @return string|null
-   *   The module name if it can be determined, NULL if it cannot.
-   */
-  public function getModuleName(PHP_CodeSniffer_File $phpcsFile) {
-    $file_parts = explode(DIRECTORY_SEPARATOR, $phpcsFile->getFilename());
-    // Ignore the filename as we are traversing directories.
-    array_pop($file_parts);
-
-    // Check each directory path for the base .module file.
-    while (count($file_parts) > 0) {
-      $path = implode(DIRECTORY_SEPARATOR, $file_parts);
-      $files = glob($path . DIRECTORY_SEPARATOR . '*.module');
-      if (count($files) == 0) {
-        // No module found, so search the parent directory.
-        array_pop($file_parts);
-        continue;
-      }
-      return basename($files[0], '.module');
-    }
-
-    return NULL;
-  }
 }

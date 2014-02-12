@@ -129,8 +129,7 @@ class Drupal7to8_Sniffs_InfoFiles_InfoToYamlSniff implements PHP_CodeSniffer_Sni
     // All done with our checks; write the YAML out again.
 # @todo For some reason, $phpcsFile->fixer->enabled is not true here when running phpcbf. wtf.
 #   if ($phpcsFile->fixer->enabled === true) {
-      $yaml = Yaml::dump($info);
-      file_put_contents($phpcsFile->getFilename() . ($needRename ? '.yml' : ''), $yaml);
+    Drupal7to8_Utility_CreateFile::writeYaml($phpcsFile->getFilename() . ($needRename ? '.yml' : ''), $info);
 
       // @todo Leave a @todo in the original .info file to remove it.
       //$contents = "; @todo: Remove this file once your module is ported.\n" . $contents;

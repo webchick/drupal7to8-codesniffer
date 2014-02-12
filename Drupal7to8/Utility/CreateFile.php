@@ -9,6 +9,10 @@
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
 
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Dumper;
+
 /**
  * Utility class for writing out files.
  *
@@ -54,6 +58,26 @@ class Drupal7to8_Utility_CreateFile {
       $pieces[0] = strtolower($pieces[0]);
     }
     return implode('', $pieces);
+  }
+
+  /**
+   * Writes a YAML file.
+   *
+   * @param string $filename
+   *   The file to write.
+   * @param array $data
+   *   An associative array to convert to YAML.
+   *
+   * @return bool
+   *   Whether the file was written successfully.
+   *
+   * @todo
+   *   We should NOT just write out the file; we should perform that operation
+   *   once processing is done. Somehow.
+   */
+  public static function writeYaml($filename, array $data) {
+    $yaml = Yaml::dump($data);
+    file_put_contents($filename, $yaml);
   }
 
 }

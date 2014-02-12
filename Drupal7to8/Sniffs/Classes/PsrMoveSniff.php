@@ -43,10 +43,17 @@ class Drupal7to8_Sniffs_Classes_PsrMoveSniff implements PHP_CodeSniffer_Sniff {
     // Check for a "lib" folder in the filename. If we don't have one, this
     // is not PSR-* compliant.
     if (!strstr($phpcsFile->getFilename(), '/lib/') || !strstr($phpcsFile->getFilename(), '/src/' /* Future-proofing */)) {
-      $phpcsFile->addError('Classes should now moved to PSR-* standards: https://drupal.org/node/1320394');
+      // Is this a test? Those are special.
+      $fileExtension = strtolower(substr($phpcsFile->getFilename(), -4));
+      if ($fileExtension === 'test') {
+        $phpcsFile->addError('Test classes should be moved into a PSR-* compatible Tests directory: https://drupal.org/node/1543796');
+      }
+      else {
+        $phpcsFile->addError('Classes should now moved to PSR-* standards: https://drupal.org/node/1320394');
+      }
     }
 
-    // Make sure there is not more than one class in a file.
+    // Also make sure there is not more than one class in the file.
     if ($this->classCount[$phpcsFile->getFilename()] > 1) {
       $phpcsFile->addError('PSR-* dictates only one class definition per file: https://drupal.org/node/1320394');
     }

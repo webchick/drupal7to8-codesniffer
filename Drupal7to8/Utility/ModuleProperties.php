@@ -9,7 +9,7 @@
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
 
-class Drupal7to8_Sniffs_Utility_ModuleProperties {
+class Drupal7to8_Utility_ModuleProperties {
 
   /**
    * Determine the module name based on the file being examined.
@@ -38,4 +38,4 @@ class Drupal7to8_Sniffs_Utility_ModuleProperties {
 
     return NULL;
   }
-} 
+}

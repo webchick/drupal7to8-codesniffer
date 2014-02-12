@@ -16,6 +16,7 @@
  * two things:
  * 1) fixability
  * 2) optionally: dynamic argument replacement
+ * 3) optionally: insertion of use statements
  *
  * @category PHP
  * @package  PHP_CodeSniffer
@@ -26,6 +27,8 @@ class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniff
   protected $forbiddenFunctions = array();
 
   protected $dynamicArgumentReplacements = array();
+
+  protected $useStatements = array();
 
   protected $message = '';
 
@@ -87,6 +90,11 @@ class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniff
         // Update the function call.
         $phpcsFile->fixer->replaceToken($stackPtr, $replacement);
       }
+      else {
+        $phpcsFile->fixer->replaceToken($stackPtr, $this->forbiddenFunctions[$function]);
+      }
+
+      $this->insertUseStatement($phpcsFile, $function, $pattern);
     }
     elseif ($fix === FALSE) {
       $phpcsFile->addError($message, $stackPtr, $this->code);
@@ -106,6 +114,20 @@ class Drupal7to8_Sniffs_Functions_FunctionReplacementSniff extends Generic_Sniff
     }
 
     return $this->forbiddenFunctions[$pattern] !== NULL;
+  }
+
+  /**
+   * Insert a use statement, if the given function needs it.
+   */
+  protected function insertUseStatement($phpcsFile, $function, $pattern) {
+    if ($pattern === NULL) {
+      $pattern = $function;
+    }
+
+    if ($this->useStatements[$pattern] !== NULL) {
+      $class = $this->useStatements[$pattern];
+      $phpcsFile->fixer->addContent(0, "\nuse $class;");
+    }
   }
 
   /**

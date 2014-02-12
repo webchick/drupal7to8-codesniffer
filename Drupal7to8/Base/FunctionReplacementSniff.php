@@ -130,7 +130,7 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
     $tokens = $phpcsFile->getTokens();
     $whitespace = $tokens[$stackPtr - 1]['content'];
 
-    $phpcsFile->fixer->replaceToken($prev_token_ptr, "\n" . $whitespace . '/** @fixme '. $message . " */\n");
+    $phpcsFile->fixer->addContentBefore($stackPtr - 1, "\n" . $whitespace . '/** @fixme '. $message . " */\n");
   }
 
   /**

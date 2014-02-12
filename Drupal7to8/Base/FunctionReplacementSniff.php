@@ -37,7 +37,7 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
   /**
    * {@inheritdoc}
    */
-  protected function addError($phpcsFile, $stackPtr, $function, $pattern = NULL) {
+  protected function addError(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $function, $pattern = NULL) {
     $fix = FALSE;
     $message = strtr($this->message, array('!function' => $function));
 
@@ -45,20 +45,7 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
       $fix = $phpcsFile->addFixableError($message, $stackPtr, $this->code);
     }
     elseif ($phpcsFile->fixer->enabled === TRUE) {
-      // Prefix the function name with fixme_ so the recursive parsing will
-      // not find it again.
-      $phpcsFile->fixer->replaceToken($stackPtr, 'fixme_' . $function);
-      $tokens = $phpcsFile->getTokens();
-      $this_line = $tokens[$stackPtr]['line'];
-      $prev_token_ptr = $stackPtr;
-      while ($tokens[$prev_token_ptr]['line'] == $this_line) {
-        $prev_token_ptr--;
-      }
-      $whitespace = '';
-      if ($tokens[$prev_token_ptr]['type'] == 'T_WHITESPACE') {
-        $whitespace = $tokens[$prev_token_ptr]['content'];
-      }
-      $phpcsFile->fixer->replaceToken($prev_token_ptr, "\n" . $whitespace . '/** @fixme '. $message . " */\n");
+      $this->insertFixMeComment($phpcsFile, $stackPtr, $message);
     }
 
     if ($fix === TRUE && $phpcsFile->fixer->enabled === TRUE) {
@@ -119,7 +106,7 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
   /**
    * Insert a use statement, if the given function needs it.
    */
-  protected function insertUseStatement($phpcsFile, $function, $pattern) {
+  protected function insertUseStatement(PHP_CodeSniffer_File $phpcsFile, $function, $pattern) {
     if ($pattern === NULL) {
       $pattern = $function;
     }
@@ -128,6 +115,26 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
       $class = $this->useStatements[$pattern];
       $phpcsFile->fixer->addContent(0, "\nuse $class;");
     }
+  }
+
+  /**
+   * Inserts a "@fixme" comment before a function call.
+   *
+   * Also prefixes the function name with fixme_ to prevent an endless loop.
+   */
+  protected function insertFixMeComment(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $message) {
+    $phpcsFile->fixer->addContentBefore($stackPtr, 'fixme_');
+    $tokens = $phpcsFile->getTokens();
+    $this_line = $tokens[$stackPtr]['line'];
+    $prev_token_ptr = $stackPtr;
+    while ($tokens[$prev_token_ptr]['line'] == $this_line) {
+      $prev_token_ptr--;
+    }
+    $whitespace = '';
+    if ($tokens[$prev_token_ptr]['type'] == 'T_WHITESPACE') {
+      $whitespace = $tokens[$prev_token_ptr]['content'];
+    }
+    $phpcsFile->fixer->replaceToken($prev_token_ptr, "\n" . $whitespace . '/** @fixme '. $message . " */\n");
   }
 
   /**
@@ -146,7 +153,7 @@ class Drupal7to8_Base_FunctionReplacementSniff extends Generic_Sniffs_PHP_Forbid
    *   - the token where removal of the nth argument should begin
    *   - the token where removal of the nth argument should end
    */
-  protected function findNthArgument($phpcsFile, $stackPtr, $n) {
+  protected function findNthArgument(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $n) {
     $tokens = $phpcsFile->getTokens();
 
     // Find If the next non-whitespace token after the function or method call

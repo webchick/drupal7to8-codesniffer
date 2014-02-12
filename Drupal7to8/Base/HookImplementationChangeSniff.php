@@ -45,22 +45,21 @@ class Drupal7to8_Base_HookImplementationChangeSniff implements PHP_CodeSniffer_S
 
     if ($tokens[$stackPtr]['type'] === 'T_FUNCTION') {
       $function_name = $tokens[$stackPtr + 2]['content'];
+      $module_name = Drupal7to8_Utility_ModuleProperties::getModuleName($phpcsFile);
 
-      // Determine the pattern to use for this function definition.
+      // Determine the expected function name.
+      $expected = $module_name . '_' . $this->hook;
       if ($this->has_alter_hook && preg_match('/_alter$/', $function_name)) {
-        $pattern = '/^(.+)_(' . $this->hook .   '_alter)$/';
-      }
-      else {
-        $pattern = '/^(.+)_(' . $this->hook .   ')$/';
+        $expected .= '_alter';
       }
 
       $matches = array();
-      if (preg_match($pattern, $function_name, $matches)) {
+      if ($function_name === $expected) {
         $message = strtr($this->message, array('!function' => $function_name));
         if ($this->is_fixable) {
           $fix = $phpcsFile->addFixableError($message, $stackPtr, $this->code);
           if ($fix === TRUE && $phpcsFile->fixer->enabled === TRUE) {
-            $this->fix($phpcsFile, $stackPtr, $matches[1], $matches[2]);
+            $this->fix($phpcsFile, $stackPtr, $module_name, $expected);
           }
         }
         else {

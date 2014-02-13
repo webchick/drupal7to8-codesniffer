@@ -76,41 +76,38 @@ class Drupal7to8_Sniffs_InfoFiles_InfoToYamlSniff implements PHP_CodeSniffer_Sni
       $info = Yaml::parse($phpcsFile->getFilename());
     }
     catch (ParseException $e) {
+      // Original .info format. Read it into an array for later use.
+      $file = file_get_contents($phpcsFile->getFilename());
+      $info = $this->drupalParseInfoFormat($file);
+
       if (!$needRename) {
         $fix = $phpcsFile->addFixableError('.info.yml file did not parse as valid YAML: https://drupal.org/node/1935708', $stackPtr, 'YamlVerify');
       }
       else {
         $fix = $phpcsFile->addFixableError('.info files are now .info.yml files: https://drupal.org/node/1935708', $stackPtr, 'InfoToYaml');
       }
-# @todo For some reason, $phpcsFile->fixer->enabled is not true here when running phpcbf. wtf.
-#     if ($fix === true && $phpcsFile->fixer->enabled === true) {
-        $file = file_get_contents($phpcsFile->getFilename());
-        $info = $this->drupalParseInfoFormat($file);
-#     }
     }
 
-    // Now we should have valid YAML. Check for required/extraneous properties.
+    // Now we have an array of info. Check for required/extraneous properties.
 
     // type: module
     if (!array_key_exists('type', $info)) {
       $fix = $phpcsFile->addFixableError('Missing required "type" property: https://drupal.org/node/1935708', $stackPtr, 'YamlVerify');
-# @todo For some reason, $phpcsFile->fixer->enabled is not true here when running phpcbf. wtf.
-#     if ($fix === true && $phpcsFile->fixer->enabled === true) {
+      if ($fix === true && $phpcsFile->fixer->enabled === true) {
         // Add it.
         // @todo: If we start fixing themes and profiles, we can't just do this.
         $info['type'] = 'module';
-#    }
+      }
     }
 
     // core: 8.x
     if ($info['core'] == '7.x') {
       $fix = $phpcsFile->addFixableError('The "core" property must change to "8.x": https://drupal.org/node/1935708', $stackPtr, 'YamlVerify');
-# @todo For some reason, $phpcsFile->fixer->enabled is not true here when running phpcbf. wtf.
-#     if ($fix === true && $phpcsFile->fixer->enabled === true) {
+      if ($fix === true && $phpcsFile->fixer->enabled === true) {
         // Fix it.
         $info['core'] = '8.x';
-#      }
-     }
+      }
+    }
 
     // files array
     if (array_key_exists('files', $info)) {
@@ -127,13 +124,12 @@ class Drupal7to8_Sniffs_InfoFiles_InfoToYamlSniff implements PHP_CodeSniffer_Sni
     // @todo: Dependencies that are no longer needed in 8.x.
 
     // All done with our checks; write the YAML out again.
-# @todo For some reason, $phpcsFile->fixer->enabled is not true here when running phpcbf. wtf.
-#   if ($phpcsFile->fixer->enabled === true) {
-    Drupal7to8_Utility_CreateFile::writeYaml($phpcsFile->getFilename() . ($needRename ? '.yml' : ''), $info);
+    if ($phpcsFile->fixer->enabled === true) {
+      Drupal7to8_Utility_CreateFile::writeYaml($phpcsFile->getFilename() . ($needRename ? '.yml' : ''), $info);
 
       // @todo Leave a @todo in the original .info file to remove it.
       //$contents = "; @todo: Remove this file once your module is ported.\n" . $contents;
-#   }
+    }
   }
 
   /**

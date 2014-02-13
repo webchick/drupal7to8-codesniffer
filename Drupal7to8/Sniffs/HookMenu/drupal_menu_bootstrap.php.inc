@@ -26,11 +26,14 @@ define('MENU_MAX_DEPTH', 9);
 define('MENU_PREFERRED_LINK', '1cf698d64d1aa4b83907cf6ed55db3a7f8e92c91');
 
 /* Wrapper function for drupal_get_path for menus */
-function drupal_get_path($type, $name) {
-  return '.';
+if(function_exists('drupal_get_path')) {
+  function drupal_get_path($type, $name) {
+    return '.';
+  }
 }
-
 /* Wrapper function to return t() */
-function t($string, array $args = array(), array $options = array()) {
-  return $string;
+if(function_exists('t')) {
+  function t($string, array $args = array(), array $options = array()) {
+    return $string;
+  }
 }

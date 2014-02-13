@@ -75,7 +75,6 @@ class Drupal7to8_Sniffs_Classes_PsrMoveSniff implements PHP_CodeSniffer_Sniff {
       }
     }
     if ($this->classCount > 1) {
-      echo $this->classCount;
       $phpcsFile->addError('PSR-* dictates only one class definition per file: https://drupal.org/node/1320394', $stackPtr);
     }
   }

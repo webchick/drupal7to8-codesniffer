@@ -11,6 +11,7 @@ class Drupal7to8_Utility_FunctionCall {
    *   The module name if it can be determined, NULL if it cannot.
    */
   static public function isFunctionCall(PHP_CodeSniffer_File $phpcsFile, $tokens, $stackPtr) {
+
     if($tokens[$stackPtr]['type'] !== "T_STRING") {
       return FALSE;
     }
@@ -36,11 +37,12 @@ class Drupal7to8_Utility_FunctionCall {
     }
 
     $nextToken = $phpcsFile->findNext(T_OPEN_PARENTHESIS, ($stackPtr + 1));
-    $backptr = ($tokens[$nextToken-1]['type'] == T_WHITESPACE) ? 2 : 1;
-    if ($nextToken - $backptr == $stackPtr) {
-      return true;
+    if(isset($tokens[$nextToken])) {
+      $backptr = ($tokens[$nextToken-1]['type'] == T_WHITESPACE) ? 2 : 1;
+      if ($nextToken - $backptr == $stackPtr) {
+        return true;
+      }
     }
-
     return false;
   }
 }

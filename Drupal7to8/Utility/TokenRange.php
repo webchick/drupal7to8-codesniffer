@@ -19,7 +19,15 @@ class Drupal7to8_Utility_TokenRange {
    * @param int $start
    * @param int $end
    */
-  public static function getContent(array $tokens, $start, $end) {
+  public static function getContent(array $tokens, $start = 0, $end = NULL) {
+    $token_keys = array_keys($tokens);
+    if(!$end) {
+      $end = array_pop($token_keys);
+    }
+    if(!$start) {
+      $start = array_shift($token_keys);
+    }
+
     $content = '';
     for ($i = $start; $i <= $end; $i++) {
       $content .= $tokens[$i]['content'];
@@ -35,6 +43,12 @@ class Drupal7to8_Utility_TokenRange {
    * @param int $end
    */
   public static function remove(PHP_CodeSniffer_Fixer $fixer, $start, $end) {
+    for ($i = $start; $i <= $end; $i++) {
+      $fixer->replaceToken($i, '');
+    }
+  }
+
+  public static function tokenSubset(array $tokens, $start, $end) {
     for ($i = $start; $i <= $end; $i++) {
       $fixer->replaceToken($i, '');
     }

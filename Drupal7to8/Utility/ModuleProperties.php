@@ -9,6 +9,9 @@
  * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
 
+/**
+ * Provides utility functions for working with Drupal module files.
+ */
 class Drupal7to8_Utility_ModuleProperties {
 
   /**
@@ -32,7 +35,7 @@ class Drupal7to8_Utility_ModuleProperties {
    *   The code sniffer file.
    *
    * @return string|null
-   *   The module name if it can be determined, NULL if it cannot.
+   *   The absolute path to the module if it can be determined, or NULL.
    */
   static public function getModulePath(PHP_CodeSniffer_File $phpcsFile) {
     $module_properties = self::getModuleNameAndPath($phpcsFile);
@@ -47,10 +50,16 @@ class Drupal7to8_Utility_ModuleProperties {
    *
    * @return array
    *   An array containing:
-   *   - module_name: The name of the module.
-   *   - module_path: The path to the module directory.
+   *   - module_name: The name of the module, or NULL.
+   *   - module_path: The absolute path to the module directory, or NULL.
    */
   static public function getModuleNameAndPath(PHP_CodeSniffer_File $phpcsFile) {
+    // Initialize the return array.
+    $module_properties = array(
+      'module_path' => NULL,
+      'module_name' => NULL,
+    );
+
     $file_parts = explode(DIRECTORY_SEPARATOR, $phpcsFile->getFilename());
     // Ignore the filename as we are traversing directories.
     array_pop($file_parts);

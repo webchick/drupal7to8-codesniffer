@@ -1,3 +1,6 @@
+/* Only run all of this code once. */
+if (!defined('MENU_IS_ROOT')) {
+
 /* Define Drupal 7 Menu Constants */
 define('MENU_IS_ROOT', 0x0001);
 define('MENU_VISIBLE_IN_TREE', 0x0002);
@@ -26,14 +29,13 @@ define('MENU_MAX_DEPTH', 9);
 define('MENU_PREFERRED_LINK', '1cf698d64d1aa4b83907cf6ed55db3a7f8e92c91');
 
 /* Wrapper function for drupal_get_path for menus */
-if(function_exists('drupal_get_path')) {
-  function drupal_get_path($type, $name) {
-    return '.';
-  }
+function drupal_get_path($type, $name) {
+  return '.';
 }
+
 /* Wrapper function to return t() */
-if(function_exists('t')) {
-  function t($string, array $args = array(), array $options = array()) {
-    return $string;
-  }
+function t($string, array $args = array(), array $options = array()) {
+  return $string;
 }
+
+} // end !defined() check.

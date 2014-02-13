@@ -96,4 +96,20 @@ class Drupal7to8_Utility_CreateFile {
     self::writeFile($filename, $yaml);
   }
 
+  /**
+   * Reads and updates a YAML file.
+   *
+   * @param string $filename
+   *   The file to write.
+   * @param array $data
+   *   An associative array to convert to YAML.
+   *
+   * @return bool
+   *   Whether the file was written successfully.
+   */
+  public static function readAndWriteYaml($filename, array $data) {
+    $yaml = Yaml::dump($data);
+    self::writeYaml($filename, $yaml);
+  }
+
 }

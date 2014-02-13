@@ -61,6 +61,26 @@ class Drupal7to8_Utility_CreateFile {
   }
 
   /**
+   * Writes a file.
+   *
+   * @param string $filename
+   *   The file to write.
+   * @param string $contents
+   *   The contents to write to the file.
+   *
+   * @return bool
+   *   Whether the file was written successfully.
+   *
+   * @todo
+   *   We should NOT just write out the file; we should perform that operation
+   *   once processing is done. Somehow.
+   */
+  public static function writeFile($filename, $contents) {
+    // This is BAD. Fix me!
+    return file_put_contents($filename, $contents);
+  }
+
+  /**
    * Writes a YAML file.
    *
    * @param string $filename
@@ -70,14 +90,10 @@ class Drupal7to8_Utility_CreateFile {
    *
    * @return bool
    *   Whether the file was written successfully.
-   *
-   * @todo
-   *   We should NOT just write out the file; we should perform that operation
-   *   once processing is done. Somehow.
    */
   public static function writeYaml($filename, array $data) {
     $yaml = Yaml::dump($data);
-    file_put_contents($filename, $yaml);
+    self::writeFile($filename, $yaml);
   }
 
 }

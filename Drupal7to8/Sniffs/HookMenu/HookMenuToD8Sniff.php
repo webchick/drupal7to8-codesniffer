@@ -23,6 +23,7 @@ class Drupal7to8_Sniffs_HookMenu_HookMenuToD8Sniff implements PHP_CodeSniffer_Sn
   protected $array_parent = FALSE;
   protected $return_var = '';
   protected $menu = array();
+  protected $menu_function_whitelist = array('drupal_get_path', 't');
 
   /**
    * Returns an array of tokens this test wants to listen for.
@@ -31,9 +32,7 @@ class Drupal7to8_Sniffs_HookMenu_HookMenuToD8Sniff implements PHP_CodeSniffer_Sn
    */
   public function register()
   {
-      return array(T_FUNCTION,
-        T_RETURN,
-      );
+      return array(T_FUNCTION);
 
   }//end register()
 
@@ -51,20 +50,24 @@ class Drupal7to8_Sniffs_HookMenu_HookMenuToD8Sniff implements PHP_CodeSniffer_Sn
       $tokens = $phpcsFile->getTokens();
       $filename_info = pathinfo($phpcsFile->getFilename());
 
-      if ($tokens[$stackPtr]['type'] == 'T_FUNCTION' && $tokens[$stackPtr+2]['content'] == $filename_info['filename'] . '_menu') {
+
+      if ($tokens[$stackPtr]['type'] == 'T_FUNCTION' &&
+         ($tokens[$stackPtr+2]['content'] == Drupal7to8_Utility_ModuleProperties::getModuleName($phpcsFile) . '_menu' || $tokens[$stackPtr+2]['content'] == 'hook_menu')) {
 
         $this->functionStart  = $tokens[$stackPtr]['scope_opener'];
         $this->functionStop = $tokens[$stackPtr]['scope_closer'];
-
-        for($i = $this->functionStart; $i < $this->functionStop; $i++) {
-          if(in_array($tokens[$stackPtr], PHP_CodeSniffer_Tokens::$scopeOpeners)) {
-            $fix = $phpcsFile->addError('Routing functionality of hook_menu() has been replaced by new routing system, conditionals found, cannot change automatically: https://drupal.org/node/1800686', $stackPtr, 'HookMenuToD8');
-
-            // Reset functionStart to 0 to stop the parser from further processing.
-            $this->functionStart = 0;
-            return;
-          }
+        $tokens = array_slice($tokens, $this->functionStart+1, ($this->functionStop - $this->functionStart - 1), true);
+        if(Drupal7to8_Utility_ParseInfoHookArray::containsLogic($tokens, $phpcsFile, $this->menu_function_whitelist)) {
+          $fix = $phpcsFile->addError('Routing functionality of hook_menu() has been replaced by new routing system, conditionals found, cannot change automatically: https://drupal.org/node/1800686', $stackPtr, 'HookMenuToD8');
+          // Reset functionStart to 0 to stop the parser from further processing.
+          $this->functionStart = $this->functionStop = 0;
+          return;
         }
+
+        // If we've gotten this far, eval the function
+        $menu_array = Drupal7to8_Utility_ParseInfoHookArray::getArray(file_get_contents(__DIR__ . '/drupal_menu_bootstrap.php.inc'), $tokens, $this->functionStart, $this->functionStop);
+
+        //print_r($menu_array);
 
         // We're in hook_menu, throw this fixable error (to create YML files
         $fix = $phpcsFile->addFixableError('Routing functionality of hook_menu() has been replaced by new routing system: https://drupal.org/node/1800686', $stackPtr, 'HookMenuToD8');
@@ -72,53 +75,24 @@ class Drupal7to8_Sniffs_HookMenu_HookMenuToD8Sniff implements PHP_CodeSniffer_Sn
           // Remove the old file.
           // @todo This is not only dangerous, it also causes an error when the file
           // it was checking suddenly vanishes. ;)
-
           //unlink($phpcsFile->getFilename());
         }
-      }
 
-      // We found an array, get me a value
-      // We need to define an array parent, and the keys for those parents should
-      // have another array (double array or open paren after it.
-      if ($this->functionStart != 0 && ($tokens[$stackPtr]['type'] == 'T_RETURN' &&
-          $stackPtr > $this->functionStart && $stackPtr < $this->functionStop)) {
-        if ($tokens[$stackPtr+2]['type'] == 'T_VARIABLE') {
-          // Get the token that contains the Variable. Parent hasn't be set yet
-          for ($i = $this->functionStart; $i < $this->functionStop; $i++) {
-            // Compare the variable we're looking at with the variable in the return.
-            if ($tokens[$i]['type'] == 'T_VARIABLE' && $tokens[$i]['content'] == $tokens[$stackPtr+2]['content']) {
-              // Get all of the string tokens
-              $this->return_var = $tokens[$i];
-              continue;
-            }
-          }
-          print_r($this->return_var);
-          for ($i = $this->functionStart; $i < $this->functionStop; $i++) {
-            if (in_array($tokens[$i]['code'], PHP_CodeSniffer_Tokens::$stringTokens) &&
-              $tokens[$i-1]['type'] == "T_OPEN_SQUARE_BRACKET" &&
-              $tokens[$i+1]['type'] == "T_CLOSE_SQUARE_BRACKET" &&
-              $tokens[$i+3]['type'] == "T_EQUAL" &&
-              $tokens[$i+5]['type'] == "T_ARRAY") {
-              $this->menu[$tokens[$i]['content']] = $this->get_menu_item($tokens, $tokens[$i+5]['parenthesis_opener'], $tokens[$i+5]['parenthesis_closer']);
-            }
-          }
+        for ($i = $this->functionStart; $i < $this->functionStop; $i++) {
+
         }
-        print_r($this->menu);
       }
-
   }//end process()
 
   protected function get_menu_item($tokens, $start, $end) {
     $menu_keys = array(
-      'title', 'title callback',
-
-    );
+      'title', 'title callback',    );
     /*
     for($i = $start; $i < $end; $i++) {
       if(in_array($tokens[$i]['code'], PHP_CodeSniffer_Tokens::$stringTokens) && )
     }
     */
 
-      return "hello";
+      return;
   }
 }
